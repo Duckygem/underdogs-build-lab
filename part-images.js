@@ -1,3 +1,4 @@
+(()=>{
 const PART_SPRITES=window.PART_SPRITES={
   'Big Boy':[0,0],
   'Gyronaut':[25,0],
@@ -122,9 +123,10 @@ document.addEventListener('click',e=>{
   refreshAfterUi();
 });
 
-const search=document.getElementById('search');
-if(search)search.addEventListener('input',refreshAfterUi);
+const gearSearchInput=document.getElementById('search');
+if(gearSearchInput)gearSearchInput.addEventListener('input',refreshAfterUi);
 
-const initial=gearSections.find(s=>s.open)||gearSections[0];
+const initial=gearSections.find(s=>s.open);
 if(initial)activateGearSection(initial);
 applyPartImages();
+})();
