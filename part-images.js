@@ -23,19 +23,25 @@ style.textContent=`
 .component>.part-sprite{width:74px;height:62px;min-height:62px;margin:2px auto 5px;border:1px solid #55583b}
 .weapon-art>.part-sprite{width:100%;height:100%;min-height:96px}
 .detail-part-icon{width:min(260px,72vw);height:170px;min-height:170px;margin:8px auto 16px;border:2px solid #72764b}
-.gear-menus{display:grid;gap:7px;margin-top:8px}
-.gear-section{background:#181c16;border:1px solid #454b3c}
-.gear-section>summary{list-style:none;cursor:pointer;padding:14px 15px;background:#555c49;color:#fff;display:flex;align-items:center;gap:10px;position:relative;border-left:4px solid #777d62}
+.gear-menus{display:grid;gap:14px;margin-top:16px;margin-bottom:10px}
+.gear-section{background:#181c16;border:2px solid #454b3c;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.gear-section>summary{box-sizing:border-box;width:100%;min-height:64px;list-style:none;cursor:pointer;padding:18px 20px;background:#555c49;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:18px;position:relative;border-left:6px solid #777d62}
 .gear-section>summary::-webkit-details-marker{display:none}
-.gear-section>summary b{font:17px 'Black Ops One';letter-spacing:.02em}
-.gear-section>summary span{margin-left:auto;margin-right:25px;color:#d4d7c3;font-size:9px;font-weight:900;letter-spacing:.08em}
-.gear-section>summary:after{content:'▶';position:absolute;right:13px;color:#f2d329;font-size:13px}
-.gear-section[open]>summary{background:#8a895c;border-left-color:#f2d329;box-shadow:inset 0 -2px #f2d329}
+.gear-section>summary b{font:21px 'Black Ops One';letter-spacing:.025em;line-height:1;flex:1 1 auto}
+.gear-section>summary span{flex:0 0 auto;margin-left:18px;margin-right:30px;color:#e2e4d5;font-size:11px;font-weight:900;letter-spacing:.09em;white-space:nowrap}
+.gear-section>summary:after{content:'▶';position:absolute;right:16px;color:#f2d329;font-size:16px;line-height:1}
+.gear-section[open]>summary{background:#8a895c;border-left-color:#f2d329;box-shadow:inset 0 -3px #f2d329}
 .gear-section[open]>summary:after{content:'▼'}
-.gear-content{background:#181c16}
+.gear-content{background:#181c16;padding-top:4px}
 .gear-section .controls{border-top:0}
-.gear-section .game-panel{padding-top:5px}
-@media(max-width:520px){.gear-section>summary{padding:12px}.gear-section>summary b{font-size:14px}.gear-section>summary span{font-size:8px}}
+.gear-section .game-panel{padding-top:7px}
+@media(max-width:520px){
+  .gear-menus{gap:11px;margin-top:13px}
+  .gear-section>summary{min-height:58px;padding:16px 16px;gap:12px;border-left-width:5px}
+  .gear-section>summary b{font-size:17px}
+  .gear-section>summary span{font-size:9px;margin-left:10px;margin-right:26px}
+  .gear-section>summary:after{right:12px;font-size:14px}
+}
 `;
 document.head.appendChild(style);
 
