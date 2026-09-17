@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNDERDOGS Build Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><div><p class="eyebrow">COMMUNITY TOOL • PROTOTYPE</p><h1>UNDERDOGS <span>BUILD LAB</span></h1><p class="sub">Search weapons, learn what they do, and start planning your next 'Rilla build.</p></div><a class="source" href="https://underdogs-vr.fandom.com/wiki/Weapons" target="_blank" rel="noreferrer">Community Wiki ↗</a></header>
+<main>
+<section class="controls"><input id="search" type="search" placeholder="Search weapons, abilities, damage…" autocomplete="off"><div id="filters"><button class="active" data-filter="all">All</button><button data-filter="melee">Melee</button><button data-filter="nailgun">Nailguns</button><button data-filter="grab">Grab</button><button data-filter="blast">Blast</button></div></section>
+<section class="builder"><div><p class="label">QUICK BUILD</p><h2>Loadout</h2><p>Tap <b>+ Build</b> on any weapon. Pick a left and right weapon and compare the combo.</p></div><div class="slots"><button class="slot" id="leftSlot" data-slot="left"><small>LEFT</small><strong>Choose weapon</strong></button><div class="versus">+</div><button class="slot" id="rightSlot" data-slot="right"><small>RIGHT</small><strong>Choose weapon</strong></button></div><button id="clearBuild" class="clear">Clear</button></section>
+<div class="section-title"><h2>Weapons</h2><span id="count"></span></div><section id="grid" class="grid"></section>
+<section class="notice"><strong>Data note</strong><p>This early prototype uses the community-maintained UNDERDOGS VR Wiki as its starting source. The wiki itself warns that some weapon values may be incomplete or inaccurate, so uncertain values are shown as such rather than guessed.</p></section>
+</main>
+<footer>Fan-made tool • Not affiliated with One Hamsa • UNDERDOGS belongs to its respective owners.</footer>
+<script src="app.js"></script>
+</body></html>
