@@ -38,3 +38,48 @@
 .builder::after,.resources::after,.coming::after{content:"";position:absolute;right:18px;top:14px;width:220px;height:52px;background-image:var(--underdogs-logo);background-repeat:no-repeat;background-position:center;background-size:contain;opacity:.035;pointer-events:none;z-index:0}
 .builder>* ,.resources>* ,.coming>*{position:relative;z-index:1}
 @media(max-width:520px){.official-wordmark{height:78px;width:90vw}.builder::after,.resources::after,.coming::after{width:150px;height:38px;right:8px;top:10px}}
+
+
+/* CARD QUALITY PASS: keep arm/bash art near native scale and match weapon layout */
+.grid.gear-info-grid{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:4px;
+}
+.grid.gear-info-grid .weapon-tile{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+.grid.gear-info-grid .weapon-art{
+  aspect-ratio:1.25;
+  background:#151811;
+}
+.grid.gear-info-grid .weapon-art>.part-sprite{
+  min-height:0;
+  width:100%;
+  height:100%;
+}
+.grid.gear-info-grid .weapon-tile strong{
+  font-size:12px;
+  padding:7px 6px 2px;
+}
+.grid.gear-info-grid .weapon-tile small{
+  font-size:8px;
+  padding:0 6px 5px;
+}
+.grid.gear-info-grid .tile-effect{
+  margin-top:0;
+  padding:6px;
+  font-size:8px;
+  line-height:1.25;
+  min-height:34px;
+}
+@media(max-width:1000px){
+  .grid.gear-info-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:800px){
+  .grid.gear-info-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .grid.gear-info-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
