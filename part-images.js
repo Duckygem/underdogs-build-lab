@@ -12,6 +12,14 @@ const PART_SPRITES=window.PART_SPRITES={
   'Stun Basher':[100,100]
 };
 
+const HQ_PART_CHUNKS=[
+  'images/parts-sprite-opt.00.b64',
+  'images/parts-sprite-opt.01.b64',
+  'images/parts-sprite-opt.02.b64',
+  'images/parts-sprite-opt.03.b64',
+  'images/parts-sprite-opt.04.b64'
+];
+
 function sprite(name,cls=''){
   const p=PART_SPRITES[name];
   if(!p)return '';
@@ -21,7 +29,8 @@ window.partSprite=sprite;
 
 const style=document.createElement('style');
 style.textContent=`
-.part-sprite{display:block;width:100%;height:100%;min-height:74px;background-image:url('images/parts-sprite.jpg?v=20260917b');background-repeat:no-repeat;background-size:500% 200%;background-color:#17190f}
+:root{--part-sprite:url('images/parts-sprite.jpg?v=20260917b')}
+.part-sprite{display:block;width:100%;height:100%;min-height:74px;background-image:var(--part-sprite);background-repeat:no-repeat;background-size:500% 200%;background-color:#17190f}
 .component>.part-sprite{width:74px;height:62px;min-height:62px;margin:2px auto 5px;border:1px solid #55583b}
 .weapon-art>.part-sprite{width:100%;height:100%;min-height:96px}
 .detail-part-icon{width:min(260px,72vw);height:170px;min-height:170px;margin:8px auto 16px;border:2px solid #72764b}
@@ -91,6 +100,30 @@ function applyPartImages(){
 
 function refreshAfterUi(){requestAnimationFrame(applyPartImages)}
 
+async function loadHQPartSprite(){
+  try{
+    const responses=await Promise.all(HQ_PART_CHUNKS.map(path=>fetch(`${path}?v=20260918a`,{cache:'force-cache'})));
+    if(responses.some(response=>!response.ok))throw new Error('HQ sprite chunk failed to load');
+    const chunks=await Promise.all(responses.map(response=>response.text()));
+    const base64=chunks.map(chunk=>chunk.trim()).join('');
+    if(base64.length!==37012)throw new Error('HQ sprite data was incomplete');
+
+    const source=`data:image/avif;base64,${base64}`;
+    await new Promise((resolve,reject)=>{
+      const image=new Image();
+      image.onload=resolve;
+      image.onerror=()=>reject(new Error('Browser could not decode HQ AVIF sprite'));
+      image.src=source;
+    });
+
+    document.documentElement.style.setProperty('--part-sprite',`url("${source}")`);
+    document.documentElement.dataset.partArt='hq';
+    refreshAfterUi();
+  }catch(error){
+    console.warn('UNDERDOGS Build Lab: keeping fallback part art.',error);
+  }
+}
+
 const gearSections=[...document.querySelectorAll('.gear-section')];
 const controls=document.querySelector('.controls');
 const gamePanel=document.querySelector('.game-panel');
@@ -129,4 +162,5 @@ if(gearSearchInput)gearSearchInput.addEventListener('input',refreshAfterUi);
 const initial=gearSections.find(s=>s.open);
 if(initial)activateGearSection(initial);
 applyPartImages();
+loadHQPartSprite();
 })();
