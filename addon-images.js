@@ -2,6 +2,7 @@
 const MODULE_URL='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/dist/index.mjs';
 const WASM_PATH='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/wasm';
 const CROP_RATIO=.44, OUT_W=320, OUT_H=240;
+const SPECIAL_FIT={"Binary Star":.82,"Shining Star":.82};
 let decoderPromise=null;
 const cache=new Map();
 
@@ -10,7 +11,7 @@ function info(data){const u24=i=>data[i]|data[i+1]<<8|data[i+2]<<16;return{bw:da
 function decoder(){if(!decoderPromise)decoderPromise=import(MODULE_URL).then(async m=>{await m.initialize({wasmPath:WASM_PATH});return m});return decoderPromise}
 function median(a){a.sort((x,y)=>x-y);return a[a.length>>1]||0}
 
-function itemCanvas(rgba,w,h){
+function itemCanvas(name,rgba,w,h){
   const cw=Math.max(1,Math.round(w*CROP_RATIO)),n=cw*h;
   const rgb=new Uint8ClampedArray(n*4);
   const rs=[],gs=[],bs=[],as=[];
@@ -111,7 +112,7 @@ function itemCanvas(rgba,w,h){
   out.width=OUT_W;out.height=OUT_H;
   const ctx=out.getContext('2d');
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  const sw=x1-x0+1,sh=y1-y0+1,scale=Math.min(292/sw,212/sh),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
+  const sw=x1-x0+1,sh=y1-y0+1,baseScale=Math.min(292/sw,212/sh),scale=baseScale*(SPECIAL_FIT[name]||1),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
   ctx.drawImage(src,x0,y0,sw,sh,Math.round((OUT_W-dw)/2),Math.round((OUT_H-dh)/2),dw,dh);
   return out;
 }
@@ -124,7 +125,7 @@ async function make(name){
   if(!bgra)throw new Error('Decode failed');
   const rgba=new Uint8ClampedArray(bgra.length);
   for(let p=0;p<bgra.length;p+=4){rgba[p]=bgra[p+2];rgba[p+1]=bgra[p+1];rgba[p+2]=bgra[p];rgba[p+3]=bgra[p+3]}
-  const canvas=itemCanvas(rgba,i.w,i.h);
+  const canvas=itemCanvas(name,rgba,i.w,i.h);
   if(!canvas)throw new Error('No foreground item found');
   const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
   const url=blob?URL.createObjectURL(blob):canvas.toDataURL('image/png');
