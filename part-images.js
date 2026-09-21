@@ -124,12 +124,14 @@ async function loadHQPartSprite(){
   }
 }
 
-const gearSections=[...document.querySelectorAll('.gear-section')];
+const gearSections=[...document.querySelectorAll('.gear-section:not(.addon-section)')];
+const addonSection=document.querySelector('.addon-section');
 const controls=document.querySelector('.controls');
 const gamePanel=document.querySelector('.game-panel');
 
 function activateGearSection(section){
   if(!section)return;
+  if(addonSection&&addonSection.open)addonSection.open=false;
   gearSections.forEach(other=>{if(other!==section)other.open=false});
   const mount=section.querySelector('.gear-content');
   if(mount){
@@ -144,6 +146,9 @@ function activateGearSection(section){
 gearSections.forEach(section=>section.addEventListener('toggle',()=>{
   if(section.open)activateGearSection(section);
 }));
+if(addonSection)addonSection.addEventListener('toggle',()=>{
+  if(addonSection.open)gearSections.forEach(section=>{section.open=false});
+});
 
 document.addEventListener('click',e=>{
   const slot=e.target.closest('.equip-slot');

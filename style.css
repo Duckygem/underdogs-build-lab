@@ -139,3 +139,21 @@
 .addon-grid .addon-tile .addon-game-icon:not([src]){opacity:0}
 .addon-grid .addon-tile strong{padding:8px 7px 9px}
 @media(max-width:520px){.addon-grid .addon-tile .weapon-art{padding:5px}}
+
+
+/* ADD-ON ART QUALITY PASS — white panels + HQ transparent item renders */
+.addon-grid .addon-tile .weapon-art{
+  aspect-ratio:1.25;
+  background:#fff;
+  border-bottom:1px solid #4d5546;
+  padding:6px;
+}
+.addon-grid .addon-tile .addon-game-icon{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  image-rendering:auto;
+  filter:drop-shadow(0 5px 5px rgba(0,0,0,.28));
+}
+.addon-grid .addon-tile .addon-game-icon:not([src]){opacity:0}
