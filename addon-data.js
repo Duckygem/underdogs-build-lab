@@ -1,0 +1,1 @@
+window.ADDONS=Object.keys(window.ADDON_ICON_ASTC||{}).map(name=>({name,tags:['Addon']}));
