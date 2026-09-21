@@ -10,7 +10,7 @@ function render(){
   const q=search.value.trim().toLowerCase();
   const list=q?all.filter(item=>item.name.toLowerCase().includes(q)):all;
   count.textContent=`${list.length} / ${all.length}`;
-  grid.innerHTML=list.map(item=>`<div class="weapon-tile addon-tile"><div class="weapon-art"><canvas class="addon-game-icon" data-addon="${esc(item.name)}" aria-label="${esc(item.name)} icon"></canvas></div><strong>${esc(item.name)}</strong></div>`).join('');
+  grid.innerHTML=list.map(item=>`<div class="weapon-tile addon-tile"><div class="weapon-art"><img class="addon-game-icon" data-addon="${esc(item.name)}" alt="${esc(item.name)}" loading="lazy" decoding="async"></div><strong>${esc(item.name)}</strong></div>`).join('');
   if(section.open)window.refreshAddonIcons?.();
 }
 search.addEventListener('input',render);
