@@ -123,3 +123,19 @@
   .addon-section>summary span{min-width:72px}
   .addon-grid .addon-tile strong{font-size:10px}
 }
+
+/* ADD-ON CLEAN ART PASS */
+.addon-grid{gap:5px}
+.addon-grid .addon-tile{background:#2b3127;border-color:#4d5546}
+.addon-grid .addon-tile .weapon-art{
+  aspect-ratio:1.25;
+  background:radial-gradient(circle at 42% 42%,#24291f 0,#151811 72%);
+  padding:7px;
+}
+.addon-grid .addon-tile .addon-game-icon{
+  width:100%;height:100%;object-fit:contain;display:block;
+  filter:drop-shadow(0 7px 7px rgba(0,0,0,.38));
+}
+.addon-grid .addon-tile .addon-game-icon:not([src]){opacity:0}
+.addon-grid .addon-tile strong{padding:8px 7px 9px}
+@media(max-width:520px){.addon-grid .addon-tile .weapon-art{padding:5px}}
