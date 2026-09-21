@@ -174,3 +174,11 @@
   image-rendering:auto;
   filter:none;
 }
+
+
+/* STAR ICON BOUNDS FIX — keep oversized circular add-ons inside the white art panel */
+.addon-game-icon[data-addon="Binary Star"],
+.addon-game-icon[data-addon="Shining Star"]{
+  transform:scale(.76);
+  transform-origin:center;
+}
