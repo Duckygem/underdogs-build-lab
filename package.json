@@ -1,0 +1,24 @@
+{
+  "name": "underdogs-build-lab",
+  "version": "1.0.0",
+  "description": "Fan-made browser tool for **UNDERDOGS VR** players.",
+  "main": "addon-data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Duckygem/underdogs-build-lab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Duckygem/underdogs-build-lab/issues"
+  },
+  "homepage": "https://github.com/Duckygem/underdogs-build-lab#readme",
+  "dependencies": {
+    "playwright": "^1.63.0",
+    "sharp": "^0.35.4"
+  }
+}

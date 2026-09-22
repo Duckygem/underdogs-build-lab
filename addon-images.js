@@ -2,6 +2,7 @@
 const MODULE_URL='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/dist/index.mjs';
 const WASM_PATH='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/wasm';
 const CROP_RATIO=.44, OUT_W=320, OUT_H=240;
+const STATIC_ICONS={"Binary Star":"assets/addons/binary-star.png?v=20260921i","Shining Star":"assets/addons/shining-star.png?v=20260921i"};
 const SPECIAL_CROP={"Binary Star":.60,"Shining Star":.60};
 const SPECIAL_FIT={"Binary Star":1,"Shining Star":1};
 let decoderPromise=null;
@@ -125,6 +126,7 @@ function itemCanvas(name,rgba,w,h){
 
 async function make(name){
   if(cache.has(name))return cache.get(name);
+  if(STATIC_ICONS[name]){cache.set(name,STATIC_ICONS[name]);return STATIC_ICONS[name]}
   const encoded=window.ADDON_ICON_ASTC?.[name];
   if(!encoded)throw new Error('Missing icon data');
   const astc=b64(encoded),i=info(astc),m=await decoder(),bgra=await m.decode_astc(astc.subarray(16),i.w,i.h,i.bw,i.bh);
