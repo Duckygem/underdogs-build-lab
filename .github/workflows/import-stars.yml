@@ -1,0 +1,122 @@
+name: Import exact star icons
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-stars.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-stars:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install image importer
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright sharp >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Pull the two exact shared ChatGPT images
+        env:
+          SHARE_URL: "https://chatgpt.com/s/m_6ab1d5c7014c819197d7fc4fad79c3c0"
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const sharp = require('sharp');
+          const fs = require('fs');
+          const path = require('path');
+
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            const context = await browser.newContext({viewport:{width:1600,height:1200}});
+            const page = await context.newPage();
+            await page.goto(process.env.SHARE_URL, {waitUntil:'domcontentloaded', timeout:120000});
+            await page.waitForTimeout(6000);
+
+            for (let i=0;i<8;i++) {
+              await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+              await page.waitForTimeout(700);
+            }
+
+            const candidates = await page.locator('img').evaluateAll(imgs => {
+              const seen = new Set();
+              return imgs.map((img,index) => ({
+                index,
+                src: img.currentSrc || img.src || '',
+                w: img.naturalWidth || 0,
+                h: img.naturalHeight || 0
+              })).filter(x => x.src && x.w >= 900 && x.h >= 700 && !seen.has(x.src) && seen.add(x.src));
+            });
+
+            if (candidates.length < 2) {
+              throw new Error('Could not locate both full-size shared images. Found: ' + JSON.stringify(candidates));
+            }
+
+            const picks = candidates.slice(0,2);
+            fs.mkdirSync('assets/addons', {recursive:true});
+            const names = ['binary-star.png','shining-star.png'];
+
+            for (let i=0;i<2;i++) {
+              const src = picks[i].src;
+              let buf;
+              if (/^https?:/i.test(src)) {
+                const response = await context.request.get(src);
+                if (!response.ok()) throw new Error('Image fetch failed: ' + response.status() + ' ' + src);
+                buf = await response.body();
+              } else {
+                const b64 = await page.locator('img').nth(picks[i].index).evaluate(async img => {
+                  const response = await fetch(img.currentSrc || img.src);
+                  const bytes = new Uint8Array(await response.arrayBuffer());
+                  let binary = '';
+                  const step = 0x8000;
+                  for (let p=0;p<bytes.length;p+=step) binary += String.fromCharCode(...bytes.subarray(p,p+step));
+                  return btoa(binary);
+                });
+                buf = Buffer.from(b64,'base64');
+              }
+              await sharp(buf).png().toFile(path.join('assets/addons', names[i]));
+            }
+
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+      - name: Point Build Lab at the static star artwork
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path("addon-images.js")
+          s = p.read_text()
+          marker = "const CROP_RATIO=.44, OUT_W=320, OUT_H=240;\n"
+          static = 'const STATIC_ICONS={"Binary Star":"assets/addons/binary-star.png?v=20260921i","Shining Star":"assets/addons/shining-star.png?v=20260921i"};\n'
+          if static not in s:
+              s = s.replace(marker, marker + static, 1)
+
+          old = "async function make(name){\n  if(cache.has(name))return cache.get(name);"
+          new = "async function make(name){\n  if(cache.has(name))return cache.get(name);\n  if(STATIC_ICONS[name]){cache.set(name,STATIC_ICONS[name]);return STATIC_ICONS[name]}"
+          if new not in s:
+              s = s.replace(old, new, 1)
+          p.write_text(s)
+
+          p = Path("index.html")
+          s = p.read_text().replace("addon-images.js?v=20260921h", "addon-images.js?v=20260921i")
+          p.write_text(s)
+          PY
+
+      - name: Publish and remove one-time importer
+        run: |
+          rm -f .github/workflows/import-stars.yml
+          git config user.name "DuckyGem Build Lab Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Use exact generated Binary and Shining Star icons"
+          git push
