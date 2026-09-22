@@ -2,7 +2,8 @@
 const MODULE_URL='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/dist/index.mjs';
 const WASM_PATH='https://cdn.jsdelivr.net/npm/texture2ddecoder-wasm@1.2.2/wasm';
 const CROP_RATIO=.44, OUT_W=320, OUT_H=240;
-const SPECIAL_FIT={"Binary Star":.82,"Shining Star":.82};
+const SPECIAL_CROP={"Binary Star":.60,"Shining Star":.60};
+const SPECIAL_FIT={"Binary Star":1,"Shining Star":1};
 let decoderPromise=null;
 const cache=new Map();
 
@@ -12,7 +13,8 @@ function decoder(){if(!decoderPromise)decoderPromise=import(MODULE_URL).then(asy
 function median(a){a.sort((x,y)=>x-y);return a[a.length>>1]||0}
 
 function itemCanvas(name,rgba,w,h){
-  const cw=Math.max(1,Math.round(w*CROP_RATIO)),n=cw*h;
+  const cropRatio=SPECIAL_CROP[name]||CROP_RATIO;
+  const cw=Math.max(1,Math.round(w*cropRatio)),n=cw*h;
   const rgb=new Uint8ClampedArray(n*4);
   const rs=[],gs=[],bs=[],as=[];
   let alphaMin=255,alphaMax=0;
@@ -112,6 +114,10 @@ function itemCanvas(name,rgba,w,h){
   out.width=OUT_W;out.height=OUT_H;
   const ctx=out.getContext('2d');
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  if(SPECIAL_CROP[name]){
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,OUT_W,OUT_H);
+  }
   const sw=x1-x0+1,sh=y1-y0+1,baseScale=Math.min(292/sw,212/sh),scale=baseScale*(SPECIAL_FIT[name]||1),dw=Math.round(sw*scale),dh=Math.round(sh*scale);
   ctx.drawImage(src,x0,y0,sw,sh,Math.round((OUT_W-dw)/2),Math.round((OUT_H-dh)/2),dw,dh);
   return out;
