@@ -12,6 +12,15 @@ const PART_SPRITES=window.PART_SPRITES={
   'Stun Basher':[100,100]
 };
 
+const BASH_ICON_FILES={
+  'Bash Bars':'assets/bash-guards/bash-bars.png?v=20260921j',
+  'Blast Basher':'assets/bash-guards/blast-basher.png?v=20260921j',
+  'Kinoflect Basher':'assets/bash-guards/kinoflect-basher.png?v=20260921j',
+  'Plow Basher':'assets/bash-guards/plow-basher.png?v=20260921j',
+  'Power Basher':'assets/bash-guards/power-basher.png?v=20260921j',
+  'Stun Basher':'assets/bash-guards/stun-basher.png?v=20260921j'
+};
+
 const HQ_PART_CHUNKS=[
   'images/parts-sprite-opt.00.b64',
   'images/parts-sprite-opt.01.b64',
@@ -21,6 +30,7 @@ const HQ_PART_CHUNKS=[
 ];
 
 function sprite(name,cls=''){
+  if(BASH_ICON_FILES[name])return `<img class="part-image bash-part-image ${cls}" data-part="${name}" src="${BASH_ICON_FILES[name]}" alt="${name}">`;
   const p=PART_SPRITES[name];
   if(!p)return '';
   return `<span class="part-sprite ${cls}" data-part="${name}" role="img" aria-label="${name}" style="background-position:${p[0]}% ${p[1]}%"></span>`;
@@ -31,9 +41,10 @@ const style=document.createElement('style');
 style.textContent=`
 :root{--part-sprite:url('images/parts-sprite.jpg?v=20260917b')}
 .part-sprite{display:block;width:100%;height:100%;min-height:74px;background-image:var(--part-sprite);background-repeat:no-repeat;background-size:500% 200%;background-color:#17190f}
-.component>.part-sprite{width:74px;height:62px;min-height:62px;margin:2px auto 5px;border:1px solid #55583b}
-.weapon-art>.part-sprite{width:100%;height:100%;min-height:96px}
-.detail-part-icon{width:min(260px,72vw);height:170px;min-height:170px;margin:8px auto 16px;border:2px solid #72764b}
+.part-image{display:block;width:100%;height:100%;min-height:74px;object-fit:contain}.bash-part-image{background:#fff}
+.component>.part-sprite,.component>.part-image{width:74px;height:62px;min-height:62px;margin:2px auto 5px;border:1px solid #55583b}
+.weapon-art>.part-sprite,.weapon-art>.part-image{width:100%;height:100%;min-height:96px}
+.detail-part-icon{width:min(260px,72vw);height:170px;min-height:170px;margin:8px auto 16px;border:2px solid #72764b;object-fit:contain;background:#fff}
 .gear-menus{display:grid;gap:20px;margin-top:20px;margin-bottom:14px}
 .gear-section{background:#181c16;border:2px solid #454b3c;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .gear-section>summary{box-sizing:border-box;width:100%;min-height:82px;list-style:none;cursor:pointer;padding:22px 64px 22px 26px;background:#555c49;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;border-left:7px solid #777d62}
@@ -58,7 +69,7 @@ document.head.appendChild(style);
 
 function setSprite(parent,name,cls=''){
   if(!parent||!PART_SPRITES[name])return;
-  const old=parent.querySelector(':scope > .part-sprite');
+  const old=parent.querySelector(':scope > .part-sprite, :scope > .part-image');
   if(old&&old.dataset.part===name)return;
   if(old)old.remove();
   parent.insertAdjacentHTML('afterbegin',sprite(name,cls));
@@ -70,7 +81,7 @@ function applyPartImages(){
     if(!PART_SPRITES[name])return;
     const box=card.querySelector('.weapon-art');
     if(!box)return;
-    const old=box.querySelector(':scope > .part-sprite');
+    const old=box.querySelector(':scope > .part-sprite, :scope > .part-image');
     if(old&&old.dataset.part===name)return;
     box.innerHTML=sprite(name);
   });
