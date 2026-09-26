@@ -10,3 +10,5 @@ Android APK for Switch-2-first Rocket League stat tracking.
 - Uses Android JobScheduler for periodic network refreshes.
 
 The data endpoint is unofficial/undocumented and may be rate-limited or changed. The app reports provider errors instead of substituting fake stats.
+
+Provider compatibility test started after Tracker Network returned HTTP 403 on Android.
