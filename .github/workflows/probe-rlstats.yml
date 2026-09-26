@@ -6,20 +6,18 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe profile by Epic name
+      - name: Inspect profile lookup
         run: |
           python - <<'PY'
-          import urllib.request
-          url='https://rlstats.net/profile/Epic/DuckyGem'
-          req=urllib.request.Request(url, headers={'User-Agent':'Mozilla/5.0'})
-          try:
-              with urllib.request.urlopen(req, timeout=25) as r:
-                  print('STATUS', r.status)
-                  print('FINAL', r.geturl())
-                  body=r.read(5000).decode('utf-8','ignore')
-                  print('HAS_PROFILE', 'DuckyGem' in body or 'Skill Rating' in body)
-                  print(body[:1000].replace('\n',' '))
-          except Exception as e:
-              print('ERROR', repr(e))
-              raise
+          import urllib.request,re,html
+          url='https://rlstats.net/profile/'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(req,timeout=25) as r:
+              body=r.read().decode('utf-8','ignore')
+              print('STATUS',r.status,'LEN',len(body))
+              for pat in [r'<form[^>]*>.*?</form>',r'<script[^>]+src=[^>]+>',r'fetch\([^;]+',r'XMLHttpRequest[^;]+',r'profile[^\n]{0,200}']:
+                  print('\nPATTERN',pat)
+                  found=re.findall(pat,body,re.I|re.S)
+                  for x in found[:20]:
+                      print(html.unescape(x)[:3000].replace('\n',' '))
           PY
