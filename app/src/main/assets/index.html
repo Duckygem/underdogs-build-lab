@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ducky RL Tracker</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1a2b;--panel2:#132238;--text:#eef5ff;--muted:#91a3bb;--line:#223650;--accent:#66c9ff;--good:#67e8a5;--bad:#ff7d8f;--warn:#ffc85a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100%}body{background:linear-gradient(180deg,#08111d,#0a1424 45%,#07111f)}button,input,select{font:inherit}.app{max-width:760px;margin:0 auto;padding:18px 16px 100px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand small{display:block;color:var(--muted);font-weight:850;letter-spacing:.14em}.brand b{font-size:25px}.badge{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:8px 10px;color:var(--muted);white-space:nowrap}.card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),#0b1727);border-radius:18px;padding:16px;margin-top:12px}.notice{font-size:12px;color:var(--muted);line-height:1.45}.connect{padding:22px 18px}.connect h2{margin:0 0 7px;font-size:24px}.connect p{color:var(--muted);font-size:13px;line-height:1.45}.field{width:100%;background:#091522;color:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 13px;font-size:16px;outline:none}.field:focus{border-color:var(--accent)}.btn{border:0;border-radius:13px;padding:13px 15px;font-weight:900;background:var(--accent);color:#05111d;min-height:46px}.btn.secondary{background:#13283e;color:#fff;border:1px solid var(--line)}.btn:disabled{opacity:.55}.stack{display:grid;gap:10px}.tabs{display:flex;gap:7px;overflow:auto;padding:13px 0 3px}.tab,.chip{border:1px solid var(--line);background:#0a1727;color:var(--muted);border-radius:999px;padding:10px 13px;font-size:12px;font-weight:850;white-space:nowrap}.tab.active,.chip.active{background:#17324a;color:#fff;border-color:#3f7ca3}.select{width:100%;background:#0a1727;color:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px}.row{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.playlist{font-size:13px;color:var(--muted)}.rank{font-size:27px;font-weight:950;line-height:1.05;margin-top:4px}.mmr{font-size:14px;margin-top:7px}.delta{text-align:right;font-size:28px;font-weight:950}.mini{font-size:11px;color:var(--muted)}.good{color:var(--good)}.bad{color:var(--bad)}.warn{color:var(--warn)}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.metric{background:var(--panel2);border-radius:13px;padding:11px;text-align:center;min-width:0}.metric b{display:block;font-size:18px;overflow:hidden;text-overflow:ellipsis}.metric span{display:block;font-size:10px;color:var(--muted);margin-top:3px}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 2px 8px;font-weight:900}.chips{display:flex;gap:6px;overflow:auto}.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{border:1px solid var(--line);background:#0a1727;border-radius:14px;padding:13px}.stat .v{font-size:22px;font-weight:950}.stat .l{font-size:11px;color:var(--muted);margin-top:3px}.listrow{padding:13px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.listrow:last-child{border-bottom:0}.listrow .name{font-weight:850}.listrow .sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}.pill{border-radius:999px;background:#152a40;padding:7px 10px;font-size:11px;font-weight:850;white-space:nowrap;height:max-content}.history{display:grid;grid-template-columns:1fr auto;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}.history:last-child{border-bottom:0}.error{background:#351a23;border-color:#6b3040;color:#ffdce3}.bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(7,17,31,.97);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:20}.bottomInner{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.nav{border:0;background:transparent;color:var(--muted);border-radius:10px;padding:10px 4px;font-size:11px;font-weight:850}.nav.active{background:#10243a;color:#fff}.hidden{display:none!important}.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}@media(min-width:620px){.stats{grid-template-columns:repeat(4,1fr)}.rank{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><small>DUCKYGEM</small><b>RL Tracker</b></div>
+    <div class="badge" id="syncBadge">Not connected</div>
+  </div>
+
+  <div id="errorBox" class="card error hidden"></div>
+
+  <section id="connectView" class="card connect">
+    <h2>Connect your Switch 2</h2>
+    <p>Rocket League console stats are looked up through the Epic account linked to your Switch. Enter only your <b>Epic display name</b> — never your password.</p>
+    <div class="stack">
+      <input id="epicInput" class="field" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Epic display name">
+      <button id="connectBtn" class="btn">Connect & load stats</button>
+    </div>
+    <p class="notice">This build uses Tracker Network's public Rocket League profile data. Because that endpoint is unofficial/undocumented, it can occasionally rate-limit or change.</p>
+  </section>
+
+  <section id="trackerView" class="hidden">
+    <div class="tabs" id="modeTabs"></div>
+    <main id="view"></main>
+  </section>
+</div>
+
+<nav id="bottomNav" class="bottom hidden" aria-label="Primary">
+  <div class="bottomInner">
+    <button class="nav active" data-view="dashboard">Dashboard</button>
+    <button class="nav" data-view="playlists">Playlists</button>
+    <button class="nav" data-view="history">History</button>
+    <button class="nav" data-view="settings">Settings</button>
+  </div>
+</nav>
+
+<script>
+(()=>{
+'use strict';
+const state={payload:null,mode:'ranked',view:'dashboard',range:'session',playlistName:null,busy:false};
+const $=s=>document.querySelector(s);
+const connectView=$('#connectView'),trackerView=$('#trackerView'),bottomNav=$('#bottomNav'),view=$('#view'),tabs=$('#modeTabs'),errorBox=$('#errorBox'),syncBadge=$('#syncBadge');
+const modeLabels={ranked:'Ranked',casual:'Casual',event:'LTM / Extra',tournament:'Tournament'};
+
+function esc(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function fmt(n){if(n===null||n===undefined||Number.isNaN(Number(n)))return '—';return Math.round(Number(n)).toLocaleString()}
+function signed(n){if(n===null||n===undefined||Number.isNaN(Number(n)))return '—';n=Math.round(Number(n));return (n>0?'+':'')+n}
+function valueOf(stats,key){return Number(stats?.[key]?.value??0)}
+function rankOf(seg){return seg?.stats?.tier?.metadata?.name||'Unranked'}
+function divOf(seg){return seg?.stats?.division?.metadata?.name||''}
+function mmrOf(seg){const v=seg?.stats?.rating?.value;return Number.isFinite(Number(v))?Math.round(Number(v)):null}
+function matchesOf(seg){return Math.max(0,Math.round(Number(seg?.stats?.matchesPlayed?.value||0)))}
+function segName(seg){return seg?.metadata?.name||'Unknown playlist'}
+function allSegments(){return state.payload?.profile?.segments||[]}
+function playlistSegments(){return allSegments().filter(s=>String(s.type).toLowerCase()==='playlist')}
+function overview(){return allSegments().find(s=>String(s.type).toLowerCase()==='overview')||null}
+function classify(seg){const n=segName(seg).toLowerCase();if(n==='un-ranked'||n==='unranked')return 'casual';if(n.includes('tournament'))return 'tournament';if(n.includes('ranked duel')||n.includes('ranked doubles')||n.includes('ranked standard'))return 'ranked';return 'event'}
+function segmentsForMode(mode){return playlistSegments().filter(s=>classify(s)===mode)}
+function currentSegment(){const arr=segmentsForMode(state.mode);if(!arr.length)return null;if(!state.playlistName||!arr.some(s=>segName(s)===state.playlistName))state.playlistName=segName(arr[0]);return arr.find(s=>segName(s)===state.playlistName)||arr[0]}
+function ranges(){const now=Date.now();return {session:now-6*3600e3,day:now-24*3600e3,week:now-7*24*3600e3,all:0}}
+function hist(){return Array.isArray(state.payload?.history)?state.payload.history:[]}
+function histInRange(){const cutoff=ranges()[state.range]??0;return hist().filter(x=>Number(x.time||0)>=cutoff)}
+function snapshotPlaylist(snap,name){return snap?.ratings?.[name]||null}
+function movementFor(name){const h=histInRange().filter(x=>snapshotPlaylist(x,name));let gain=0,lost=0,net=0,games=0;if(h.length<2)return {gain,lost,net,games,start:null,end:h[0]||null};for(let i=1;i<h.length;i++){const a=snapshotPlaylist(h[i-1],name),b=snapshotPlaylist(h[i],name);if(!a||!b)continue;const d=Number(b.rating||0)-Number(a.rating||0);if(d>0)gain+=d;else if(d<0)lost+=Math.abs(d);const gm=Number(b.matches||0)-Number(a.matches||0);if(gm>0)games+=gm;}const first=snapshotPlaylist(h[0],name),last=snapshotPlaylist(h[h.length-1],name);net=first&&last?Number(last.rating||0)-Number(first.rating||0):0;return {gain,lost,net,games,start:h[0],end:h[h.length-1]}}
+function overallTracked(){const h=histInRange();if(h.length<2)return {games:0,wins:0,winPct:null,goals:0,shots:0,saves:0,assists:0,mvps:0};const a=h[0]?.totals||{},b=h[h.length-1]?.totals||{};const d=k=>Math.max(0,Number(b[k]||0)-Number(a[k]||0));const games=Math.max(0,Number(b.playlistMatchSum||0)-Number(a.playlistMatchSum||0));const wins=d('wins');return {games,wins,winPct:games>0?Math.min(100,Math.round(wins/games*100)):null,goals:d('goals'),shots:d('shots'),saves:d('saves'),assists:d('assists'),mvps:d('mVPs')}}
+function liveStats(){const o=overview()?.stats||{};return {wins:valueOf(o,'wins'),mvps:valueOf(o,'mVPs'),goals:valueOf(o,'goals'),assists:valueOf(o,'assists'),saves:valueOf(o,'saves'),shots:valueOf(o,'shots'),ratio:valueOf(o,'goalShotRatio')}}
+function lastSyncText(){const t=Number(state.payload?.lastSync||0);if(!t)return 'Never synced';const mins=Math.floor((Date.now()-t)/60000);if(mins<1)return 'Updated now';if(mins<60)return 'Updated '+mins+'m ago';const h=Math.floor(mins/60);return 'Updated '+h+'h ago'}
+function setBusy(b){state.busy=b;$('#connectBtn').disabled=b;$('#connectBtn').innerHTML=b?'<span class="spinner"></span>Loading…':'Connect & load stats'}
+function showError(msg){if(msg){errorBox.textContent=msg;errorBox.classList.remove('hidden')}else errorBox.classList.add('hidden')}
+function modeTabs(){const usable=Object.keys(modeLabels).filter(k=>segmentsForMode(k).length>0);if(!usable.includes(state.mode))state.mode=usable[0]||'ranked';tabs.innerHTML=usable.map(k=>'<button class="tab '+(state.mode===k?'active':'')+'" data-mode="'+k+'">'+modeLabels[k]+'</button>').join('');tabs.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{state.mode=b.dataset.mode;state.playlistName=null;render()}))}
+function statCard(label,value,sub=''){return '<div class="stat"><div class="v">'+esc(value)+'</div><div class="l">'+esc(label)+(sub?' · '+esc(sub):'')+'</div></div>'}
+function dashboard(){const seg=currentSegment();if(!seg){view.innerHTML='<div class="card notice">No playlists were returned for this category.</div>';return}const name=segName(seg),move=movementFor(name),tracked=overallTracked(),life=liveStats(),rank=state.mode==='casual'?'Casual rating':rankOf(seg),division=state.mode==='casual'?'':divOf(seg),mmr=mmrOf(seg);const win=tracked.winPct===null?'—':tracked.winPct+'%';const shoot=tracked.shots>0?Math.round(tracked.goals/tracked.shots*100)+'%':(life.ratio?life.ratio.toFixed(1)+'%':'—');view.innerHTML=
+'<select id="playlistSelect" class="select">'+segmentsForMode(state.mode).map(s=>'<option '+(segName(s)===name?'selected':'')+'>'+esc(segName(s))+'</option>').join('')+'</select>'+
+'<div class="card"><div class="row"><div><div class="playlist">'+esc(name)+'</div><div class="rank">'+esc(rank)+(division?' · '+esc(division):'')+'</div><div class="mmr">'+(mmr===null?'Rating unavailable':fmt(mmr)+' rating')+'</div></div><div><div class="mini">'+esc(state.range.toUpperCase())+'</div><div class="delta '+(move.net>=0?'good':'bad')+'">'+signed(move.net)+'</div><div class="mini">MMR NET</div></div></div><div class="grid3"><div class="metric"><b>'+move.games+'</b><span>Tracked games</span></div><div class="metric"><b>'+win+'</b><span>Tracked win rate</span></div><div class="metric"><b>'+shoot+'</b><span>Shooting</span></div></div></div>'+
+'<div class="sectionTitle"><span>Tracking window</span><div class="chips">'+[['session','6h'],['day','24h'],['week','7d'],['all','All']].map(([k,l])=>'<button class="chip '+(state.range===k?'active':'')+'" data-range="'+k+'">'+l+'</button>').join('')+'</div></div>'+
+'<div class="card"><div class="grid3"><div class="metric"><b class="good">+'+fmt(move.gain)+'</b><span>MMR gained</span></div><div class="metric"><b class="bad">−'+fmt(move.lost)+'</b><span>MMR lost</span></div><div class="metric"><b>'+signed(move.net)+'</b><span>Net change</span></div></div></div>'+
+'<div class="sectionTitle">Performance</div><div class="stats">'+statCard('Goals',tracked.games?tracked.goals:fmt(life.goals),tracked.games?'tracked':'lifetime')+statCard('Shots',tracked.games?tracked.shots:fmt(life.shots),tracked.games?'tracked':'lifetime')+statCard('Shooting',shoot,tracked.games?'tracked':'lifetime')+statCard('Saves',tracked.games?tracked.saves:fmt(life.saves),tracked.games?'tracked':'lifetime')+statCard('Assists',tracked.games?tracked.assists:fmt(life.assists),tracked.games?'tracked':'lifetime')+statCard('Wins',tracked.games?tracked.wins:fmt(life.wins),tracked.games?'tracked':'lifetime')+statCard('MVPs',tracked.games?tracked.mvps:fmt(life.mvps),tracked.games?'tracked':'lifetime')+statCard('Playlist games',fmt(matchesOf(seg)),'season')+'</div>'+
+(state.mode==='casual'?'<div class="card notice"><b>Casual note:</b> Rocket League uses one shared casual rating. 1v1, 2v2, 3v3 and 4v4 casual do not have separate public MMR values here.</div>':'');
+$('#playlistSelect').addEventListener('change',e=>{state.playlistName=e.target.value;render()});view.querySelectorAll('[data-range]').forEach(b=>b.addEventListener('click',()=>{state.range=b.dataset.range;render()}))}
+function playlistsView(){const arr=segmentsForMode(state.mode);view.innerHTML='<div class="card">'+(arr.map(s=>{const n=segName(s),m=movementFor(n),r=state.mode==='casual'?'Casual rating':rankOf(s),d=state.mode==='casual'?'':divOf(s),rating=mmrOf(s);return '<div class="listrow"><div><div class="name">'+esc(n)+'</div><div class="sub">'+esc(r)+(d?' · '+esc(d):'')+' · '+(rating===null?'No rating':fmt(rating)+' rating')+' · '+fmt(matchesOf(s))+' season matches</div></div><div class="pill '+(m.net>=0?'good':'bad')+'">'+signed(m.net)+'</div></div>'}).join('')||'<div class="notice">No playlists available.</div>')+'</div>'}
+function historyView(){const h=hist().slice().reverse().slice(0,40);if(!h.length){view.innerHTML='<div class="card notice">No sync history yet. Tap Refresh after you play to start recording movement.</div>';return}view.innerHTML='<div class="card">'+h.map((x,i)=>{const dt=new Date(Number(x.time||0));const count=Object.keys(x.ratings||{}).length;return '<div class="history"><div><b>'+dt.toLocaleString()+'</b><div class="mini">'+count+' playlists captured · '+fmt(x.totals?.wins||0)+' lifetime wins</div></div><div class="pill">Snapshot '+(h.length-i)+'</div></div>'}).join('')+'</div>'}
+function settingsView(){const name=state.payload?.epicName||'';view.innerHTML='<div class="card"><div class="listrow"><div><div class="name">Switch 2 account</div><div class="sub">Epic-linked profile: '+esc(name)+'</div></div><button id="refreshBtn" class="btn secondary">Refresh</button></div><div class="listrow"><div><div class="name">Background sync</div><div class="sub">Android schedules network sync roughly every 15 minutes. Android may delay jobs to save battery.</div></div><div class="pill good">ON</div></div><div class="listrow"><div><div class="name">Data source</div><div class="sub">Tracker Network Rocket League profile endpoint. Unofficial and subject to provider changes/rate limits.</div></div></div><div class="listrow"><div><div class="name">Version</div><div class="sub">0.2.0-live</div></div></div><button id="changeBtn" class="btn secondary" style="width:100%;margin-top:12px">Change Epic display name</button></div>';$('#refreshBtn').addEventListener('click',refresh);$('#changeBtn').addEventListener('click',()=>{trackerView.classList.add('hidden');bottomNav.classList.add('hidden');connectView.classList.remove('hidden');$('#epicInput').value=name})}
+function render(){if(!state.payload?.profile){connectView.classList.remove('hidden');trackerView.classList.add('hidden');bottomNav.classList.add('hidden');syncBadge.textContent=state.payload?.epicName?'Connected · no data':'Not connected';return}connectView.classList.add('hidden');trackerView.classList.remove('hidden');bottomNav.classList.remove('hidden');syncBadge.textContent=lastSyncText();modeTabs();document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===state.view));if(state.view==='dashboard')dashboard();else if(state.view==='playlists')playlistsView();else if(state.view==='history')historyView();else settingsView()}
+function refresh(){if(!window.Android)return showError('Native Android bridge is unavailable.');showError('');syncBadge.innerHTML='<span class="spinner"></span>Syncing';window.Android.refresh()}
+window.DuckyRL={onNativePayload(raw){let p;try{p=JSON.parse(raw)}catch(e){showError('Could not read stats response.');return}state.payload=p;setBusy(false);if(p.epicName)$('#epicInput').value=p.epicName;if(!p.ok&&p.error)showError(p.error);else if(p.error&&!p.profile)showError(p.error);else showError('');render()}};
+$('#connectBtn').addEventListener('click',()=>{const name=$('#epicInput').value.trim();if(!name)return showError('Enter your Epic display name.');if(!window.Android)return showError('This page must be opened inside the Android app.');setBusy(true);showError('');window.Android.connect(name)});
+document.querySelectorAll('.nav').forEach(n=>n.addEventListener('click',()=>{state.view=n.dataset.view;render()}));
+if(window.Android){window.Android.ready()}else{showError('Android bridge unavailable. Install the APK to use live stats.')}
+})();
+</script>
+</body>
+</html>
