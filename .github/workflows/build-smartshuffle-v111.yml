@@ -1,0 +1,89 @@
+name: Build SmartShuffle v1.1.1 Icon Update APK
+
+on:
+  push:
+    branches:
+      - smartshuffle-apk-build
+    paths:
+      - 'smartshuffle-v111/**'
+      - '.github/workflows/build-smartshuffle-v111.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Verify and unpack v1.1.1 updated source
+        shell: bash
+        run: |
+          base64 --decode smartshuffle-v111/project.b64 > /tmp/smartshuffle-v11.tar.xz
+          echo "327f54310441572bef84bf36ed11394dd36b1bd75661681b00bc730e30bf09e7  /tmp/smartshuffle-v11.tar.xz" | sha256sum -c -
+          mkdir -p SmartShuffle
+          tar -xJf /tmp/smartshuffle-v11.tar.xz -C SmartShuffle
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Verify preinstalled Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then echo "SDK manager missing"; exit 1; fi
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Restore verified SmartShuffle v1.1 signing identity
+        id: signing
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.config/.android/debug.keystore
+          key: smartshuffle-v11-debug-signing-2026-v1
+
+      - name: Stop if the original v1.1 signing key is missing or different
+        shell: bash
+        run: |
+          test "${{ steps.signing.outputs.cache-hit }}" = "true" || {
+            echo "::error::Signing cache missing. Restore from offline signing backup; NEVER generate a new key."
+            exit 1
+          }
+          test -s "$HOME/.config/.android/debug.keystore"
+          actual="$(sha256sum "$HOME/.config/.android/debug.keystore" | cut -d' ' -f1)"
+          expected="3faa651577e9a537473a9ff31ac09a19f292f4bd0728b37bac5323ae6fd1e60f"
+          test "$actual" = "$expected" || {
+            echo "::error::Wrong signing identity. Aborting to protect Android updates."
+            exit 1
+          }
+          echo "Signing identity verified."
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compile v1.1.1 Android APK
+        working-directory: SmartShuffle
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Export APK signing fingerprint
+        working-directory: SmartShuffle
+        run: gradle --no-daemon :app:signingReport > ../SmartShuffle-v111-signing.txt
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartShuffle-v1.1.1-PurplePlayIcon-APK
+          path: |
+            SmartShuffle/app/build/outputs/apk/debug/app-debug.apk
+            SmartShuffle-v111-signing.txt
+          if-no-files-found: error
+          retention-days: 90
