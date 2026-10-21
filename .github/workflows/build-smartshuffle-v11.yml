@@ -42,11 +42,11 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Restore existing SmartShuffle signing identity
+      - name: Cache stable SmartShuffle v1.1 signing identity
         uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
-          key: smartshuffle-debug-signing-2026-v1
+          path: ~/.config/.android/debug.keystore
+          key: smartshuffle-v11-debug-signing-2026-v1
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
