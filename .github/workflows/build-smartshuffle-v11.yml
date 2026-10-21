@@ -1,0 +1,72 @@
+name: Build SmartShuffle v1.1 Midnight Purple APK
+
+on:
+  push:
+    branches:
+      - smartshuffle-apk-build
+    paths:
+      - 'smartshuffle-v11/**'
+      - '.github/workflows/build-smartshuffle-v11.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Verify and unpack polished v1.1 source
+        shell: bash
+        run: |
+          base64 --decode smartshuffle-v11/project.b64 > /tmp/smartshuffle-v11.tar.xz
+          echo "d342299a91b312b59476ce82a6d479a224dc118929dbcb458d7f2bbc41c38f7f  /tmp/smartshuffle-v11.tar.xz" | sha256sum -c -
+          mkdir -p SmartShuffle
+          tar -xJf /tmp/smartshuffle-v11.tar.xz -C SmartShuffle
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Verify preinstalled Android SDK
+        shell: bash
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          if [ -z "$SDKMANAGER" ]; then echo "SDK manager missing"; exit 1; fi
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Restore existing SmartShuffle signing identity
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: smartshuffle-debug-signing-2026-v1
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compile v1.1 Android APK
+        working-directory: SmartShuffle
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Export APK signing fingerprint
+        working-directory: SmartShuffle
+        run: gradle --no-daemon :app:signingReport > ../SmartShuffle-v11-signing.txt
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartShuffle-v1.1-MidnightPurple-APK
+          path: |
+            SmartShuffle/app/build/outputs/apk/debug/app-debug.apk
+            SmartShuffle-v11-signing.txt
+          if-no-files-found: error
+          retention-days: 90
