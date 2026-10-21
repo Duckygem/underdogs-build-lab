@@ -27,6 +27,7 @@ jobs:
           echo "61bf10f82e96cdd795d9467054f6cafc3eedfefb2517d020315dffefa2ec1a26  /tmp/smartshuffle-source.tar.xz" | sha256sum -c -
           mkdir -p SmartShuffle
           tar -xJf /tmp/smartshuffle-source.tar.xz -C SmartShuffle
+          sed -i 's/; fillViewport = true/; isFillViewport = true/' SmartShuffle/app/src/main/java/com/duckygem/smartshuffle/MainActivity.kt
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
