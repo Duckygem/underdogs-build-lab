@@ -42,11 +42,28 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Cache stable SmartShuffle v1.1 signing identity
-        uses: actions/cache@v4
+      - name: Restore verified SmartShuffle v1.1 signing identity
+        id: signing
+        uses: actions/cache/restore@v4
         with:
           path: ~/.config/.android/debug.keystore
           key: smartshuffle-v11-debug-signing-2026-v1
+
+      - name: Stop if the original v1.1 signing key is missing or different
+        shell: bash
+        run: |
+          test "${{ steps.signing.outputs.cache-hit }}" = "true" || {
+            echo "::error::Signing cache missing. Restore from offline signing backup; NEVER generate a new key."
+            exit 1
+          }
+          test -s "$HOME/.config/.android/debug.keystore"
+          actual="$(sha256sum "$HOME/.config/.android/debug.keystore" | cut -d' ' -f1)"
+          expected="3faa651577e9a537473a9ff31ac09a19f292f4bd0728b37bac5323ae6fd1e60f"
+          test "$actual" = "$expected" || {
+            echo "::error::Wrong signing identity. Aborting to protect Android updates."
+            exit 1
+          }
+          echo "Signing identity verified."
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
