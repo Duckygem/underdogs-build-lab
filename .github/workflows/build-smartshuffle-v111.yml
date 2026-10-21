@@ -26,7 +26,7 @@ jobs:
           base64 --decode smartshuffle-v111/project.b64 > /tmp/smartshuffle-v11.tar.xz
           echo "327f54310441572bef84bf36ed11394dd36b1bd75661681b00bc730e30bf09e7  /tmp/smartshuffle-v11.tar.xz" | sha256sum -c -
           mkdir -p SmartShuffle
-          tar -xJf /tmp/smartshuffle-v11.tar.xz -C SmartShuffle
+          tar -xJf /tmp/smartshuffle-v11.tar.xz -C .
 
       - name: Set up Java
         uses: actions/setup-java@v4
