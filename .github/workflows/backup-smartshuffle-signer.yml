@@ -1,0 +1,53 @@
+name: Recover encrypted SmartShuffle v1.1 signing backup
+
+on:
+  push:
+    branches: [smartshuffle-apk-build]
+    paths:
+      - '.github/workflows/backup-smartshuffle-signer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore saved signing key
+        id: restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.config/.android/debug.keystore
+          key: smartshuffle-v11-debug-signing-2026-v1
+
+      - name: Ensure this is the verified v1.1 signing key
+        shell: bash
+        run: |
+          test "${{ steps.restore.outputs.cache-hit }}" = "true"
+          test -s "$HOME/.config/.android/debug.keystore"
+          keytool -list -v -keystore "$HOME/.config/.android/debug.keystore" -storepass android -alias AndroidDebugKey > /tmp/signer-info.txt
+          grep -F 'SHA1: 5F:90:EE:13:83:31:78:55:F8:DD:6C:01:01:3C:C2:E1:47:62:60:D1' /tmp/signer-info.txt
+          echo "Recovered matching v1.1 certificate"
+
+      - name: Encrypt signer for offline private recovery
+        shell: bash
+        run: |
+          mkdir -p encrypted-signing-backup
+          openssl rand -hex 32 > /tmp/smartshuffle-pass.txt
+          openssl enc -aes-256-cbc -pbkdf2 -iter 350000 -salt             -in "$HOME/.config/.android/debug.keystore"             -out encrypted-signing-backup/smartshuffle-v11-keystore.aes             -pass file:/tmp/smartshuffle-pass.txt
+          openssl pkeyutl -encrypt -pubin             -inkey smartshuffle-v11/backup-public-key.pem             -pkeyopt rsa_padding_mode:oaep             -pkeyopt rsa_oaep_md:sha256             -in /tmp/smartshuffle-pass.txt             -out encrypted-signing-backup/smartshuffle-v11-key.rsa
+          sha256sum "$HOME/.config/.android/debug.keystore" > /tmp/keystore.sha256
+          sed 's@.*/debug.keystore@debug.keystore@' /tmp/keystore.sha256 > encrypted-signing-backup/keystore.sha256
+          echo "SHA1=5F:90:EE:13:83:31:78:55:F8:DD:6C:01:01:3C:C2:E1:47:62:60:D1" > encrypted-signing-backup/signing-fingerprint.txt
+          rm -f /tmp/smartshuffle-pass.txt
+
+      - name: Export ciphertext only (no unencrypted key)
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartShuffle-v11-encrypted-signing-backup
+          path: encrypted-signing-backup/
+          if-no-files-found: error
+          retention-days: 90
