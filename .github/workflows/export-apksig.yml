@@ -1,0 +1,31 @@
+name: Export open-source Android APK signing library
+
+on:
+  push:
+    branches: [smartshuffle-apk-build]
+    paths:
+      - '.github/workflows/export-apksig.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tool:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Download Apache-licensed Android apksig library
+        shell: bash
+        run: |
+          mkdir -p out
+          curl -fL --retry 3 -o out/apksig-8.7.3.jar             https://dl.google.com/dl/android/maven2/com/android/tools/build/apksig/8.7.3/apksig-8.7.3.jar
+          test -s out/apksig-8.7.3.jar
+          unzip -t out/apksig-8.7.3.jar | tail -1
+
+      - name: Download tool artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apksig-8.7.3-jar
+          path: out/apksig-8.7.3.jar
+          retention-days: 7
